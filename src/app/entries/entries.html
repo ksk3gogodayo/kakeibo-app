@@ -1,0 +1,35 @@
+<div class="entries-form">
+  <h2>支出を登録</h2>
+
+  <label>品名</label>
+  <input [(ngModel)]="entry.title" placeholder="例：スーパーで買い物" />
+
+  <label>金額</label>
+  <input type="number" [(ngModel)]="entry.amount" />
+
+  <label>カテゴリ</label>
+  <select [(ngModel)]="entry.category">
+    @for (cat of categories; track cat) {
+      <option [value]="cat">{{ cat }}</option>
+    }
+  </select>
+
+  <label>決済方法</label>
+  <select [(ngModel)]="entry.paymentMethod">
+    @for (pm of paymentMethods; track pm) {
+      <option [value]="pm">{{ pm }}</option>
+    }
+  </select>
+
+  <label>引き落とし方法</label>
+  <select [(ngModel)]="entry.billingMethod">
+    @for (bm of billingMethods; track bm) {
+      <option [value]="bm">{{ bm }}</option>
+    }
+  </select>
+
+  <label>日付</label>
+  <input type="date" [(ngModel)]="entry.date" />
+
+  <button (click)="save()">保存</button>
+</div>

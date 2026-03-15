@@ -3,11 +3,12 @@ import { RouterOutlet } from '@angular/router';
 import { LoginComponent } from './login/login.component';
 import { onAuthStateChanged, User, signOut } from 'firebase/auth';
 import { auth } from './firebase';
+import { Entries } from './entries/entries';
 
 @Component({
   selector: 'app-root',
   standalone: true,
-  imports: [RouterOutlet, LoginComponent],
+  imports: [RouterOutlet, LoginComponent, Entries],
   templateUrl: './app.html',
   styleUrl: './app.scss',
 })
