@@ -33,3 +33,18 @@
 
   <button (click)="save()">保存</button>
 </div>
+
+<hr />
+
+<h2>支出一覧</h2>
+@if (entryList.length === 0) {
+  <p>まだ記録がありません</p>
+} @else {
+  @for (e of entryList; track e.id) {
+    <div style="border: 1px solid #ccc; padding: 8px; margin-bottom: 8px; border-radius: 4px;">
+      <p>📅 {{ e.date }} | {{ e.title }} | ¥{{ e.amount }}</p>
+      <p>🏷 {{ e.category }} | 💳 {{ e.paymentMethod }} | 🏦 {{ e.billingMethod }}</p>
+      <button (click)="delete(e.id!)">削除</button>
+    </div>
+  }
+}
