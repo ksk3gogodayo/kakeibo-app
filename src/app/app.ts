@@ -1,12 +1,29 @@
-import { Component, signal } from '@angular/core';
+import { Component, ChangeDetectorRef } from '@angular/core';
 import { RouterOutlet } from '@angular/router';
+import { LoginComponent } from './login/login.component';
+import { onAuthStateChanged, User, signOut } from 'firebase/auth';
+import { auth } from './firebase';
 
 @Component({
   selector: 'app-root',
-  imports: [RouterOutlet],
+  standalone: true,
+  imports: [RouterOutlet, LoginComponent],
   templateUrl: './app.html',
-  styleUrl: './app.scss'
+  styleUrl: './app.scss',
 })
-export class App {
-  protected readonly title = signal('kakeibo-app');
+export class AppComponent {
+  user: User | null = null;
+  loading = true;
+
+  constructor(private cdr: ChangeDetectorRef) {
+    onAuthStateChanged(auth, (u) => {
+      this.user = u;
+      this.loading = false;
+      this.cdr.detectChanges();
+    });
+  }
+
+  async logout() {
+    await signOut(auth);
+  }
 }
