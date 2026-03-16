@@ -1,0 +1,18 @@
+:host {
+  display: block;
+}
+
+div {
+  background: var(--color-surface);
+  border-radius: var(--radius);
+  padding: 16px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+
+  h2 {
+    margin-bottom: 16px;
+  }
+
+  canvas {
+    max-height: 320px;
+  }
+}

@@ -1,57 +1,80 @@
-<div class="entries-form">
+<div class="entries-form card">
   <h2>{{ editTargetId ? '支出を編集' : '支出を登録' }}</h2>
 
-  <label>品名</label>
-  <input [(ngModel)]="entry.title" placeholder="例：スーパーで買い物" />
+  <div class="field">
+    <label>品名</label>
+    <input [(ngModel)]="entry.title" placeholder="例：スーパーで買い物" />
+  </div>
 
-  <label>金額</label>
-  <input type="number" [(ngModel)]="entry.amount" />
+  <div class="field">
+    <label>金額</label>
+    <input type="number" [(ngModel)]="entry.amount" inputmode="numeric" />
+  </div>
 
-  <label>カテゴリ</label>
-  <select [(ngModel)]="entry.category">
-    @for (cat of categories; track cat) {
-      <option [value]="cat">{{ cat }}</option>
+  <div class="field">
+    <label>カテゴリ</label>
+    <select [(ngModel)]="entry.category">
+      @for (cat of categories; track cat) {
+        <option [value]="cat">{{ cat }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label>決済方法</label>
+    <select [(ngModel)]="entry.paymentMethod">
+      @for (pm of paymentMethods; track pm) {
+        <option [value]="pm">{{ pm }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label>引き落とし方法</label>
+    <select [(ngModel)]="entry.billingMethod">
+      @for (bm of billingMethods; track bm) {
+        <option [value]="bm">{{ bm }}</option>
+      }
+    </select>
+  </div>
+
+  <div class="field">
+    <label>日付</label>
+    <input type="date" [(ngModel)]="entry.date" />
+  </div>
+
+  <div class="form-actions">
+    <button class="btn-primary" (click)="save()">{{ editTargetId ? '更新' : '保存' }}</button>
+    @if (editTargetId) {
+      <button class="btn-secondary" type="button" (click)="reset()">キャンセル</button>
     }
-  </select>
-
-  <label>決済方法</label>
-  <select [(ngModel)]="entry.paymentMethod">
-    @for (pm of paymentMethods; track pm) {
-      <option [value]="pm">{{ pm }}</option>
-    }
-  </select>
-
-  <label>引き落とし方法</label>
-  <select [(ngModel)]="entry.billingMethod">
-    @for (bm of billingMethods; track bm) {
-      <option [value]="bm">{{ bm }}</option>
-    }
-  </select>
-
-  <label>日付</label>
-  <input type="date" [(ngModel)]="entry.date" />
-
-  <button (click)="save()">{{ editTargetId ? '更新' : '保存' }}</button>
-  @if (editTargetId) {
-    <button type="button" (click)="reset()">キャンセル</button>
-  }
+  </div>
 </div>
 
-<hr />
-
-<div style="display:flex; align-items:center; gap:16px; margin-bottom:8px;">
-  <h2 style="margin:0">支出一覧</h2>
-  <button (click)="exportCsv()" [disabled]="entryList.length === 0">CSVエクスポート</button>
+<div class="list-header">
+  <h2>支出一覧</h2>
+  <button class="btn-outline" (click)="exportCsv()" [disabled]="entryList.length === 0">CSVエクスポート</button>
 </div>
+
 @if (entryList.length === 0) {
-  <p>まだ記録がありません</p>
+  <p class="empty">まだ記録がありません</p>
 } @else {
   @for (e of entryList; track e.id) {
-  <div style="border: 1px solid #ccc; padding: 8px; margin-bottom: 8px; border-radius: 4px;">
-    <p>📅 {{ e.date }} | {{ e.title }} | ¥{{ e.amount }}</p>
-    <p>🏷 {{ e.category }} | 💳 {{ e.paymentMethod }} | 🏦 {{ e.billingMethod }}</p>
-    <button (click)="edit(e)">編集</button>
-    <button (click)="delete(e.id!)">削除</button>
-  </div>
+    <div class="entry-card card">
+      <div class="entry-main">
+        <span class="entry-title">{{ e.title }}</span>
+        <span class="entry-amount">¥{{ e.amount | number }}</span>
+      </div>
+      <div class="entry-meta">
+        <span>{{ e.date }}</span>
+        <span>{{ e.category }}</span>
+        <span>{{ e.paymentMethod }}</span>
+        <span>{{ e.billingMethod }}</span>
+      </div>
+      <div class="entry-actions">
+        <button class="btn-sm btn-secondary" (click)="edit(e)">編集</button>
+        <button class="btn-sm btn-danger" (click)="delete(e.id!)">削除</button>
+      </div>
+    </div>
   }
 }
