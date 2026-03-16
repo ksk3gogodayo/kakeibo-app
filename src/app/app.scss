@@ -30,6 +30,27 @@
     color: var(--color-primary);
   }
 
+  .lang-switcher {
+    display: flex;
+    gap: 4px;
+
+    button {
+      font-size: 0.75rem;
+      padding: 4px 8px;
+      background: none;
+      border: 1px solid var(--color-border);
+      border-radius: var(--radius-sm);
+      color: var(--color-muted);
+
+      &.active {
+        background: var(--color-primary);
+        border-color: var(--color-primary);
+        color: #fff;
+        font-weight: 600;
+      }
+    }
+  }
+
   .logout-btn {
     font-size: 0.8125rem;
     color: var(--color-muted);

@@ -4,6 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { MASTER_DEFAULTS } from '../settings/settings';
+import { LangService } from '../lang.service';
+import { Translations } from '../i18n';
 
 interface Entry {
   id?: string;
@@ -38,13 +40,19 @@ export class Entries implements OnInit {
   paymentMethods: string[] = [...MASTER_DEFAULTS.paymentMethods];
   billingMethods: string[] = [...MASTER_DEFAULTS.billingMethods];
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  get t(): Translations {
+    return this.langService.t;
+  }
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private langService: LangService,
+  ) {}
 
   ngOnInit() {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
 
-    // マスターデータをリアルタイムで読み込む
     onSnapshot(doc(db, 'users', uid, 'settings', 'master'), (snap) => {
       if (snap.exists()) {
         const data = snap.data();
@@ -64,7 +72,6 @@ export class Entries implements OnInit {
     });
   }
 
-  // 編集ボタンを押した時
   edit(e: Entry) {
     this.editTargetId = e.id!;
     this.entry = { ...e };
@@ -76,15 +83,13 @@ export class Entries implements OnInit {
     if (!uid) return;
 
     if (this.editTargetId) {
-      // 編集モード → 上書き保存
       const ref = doc(db, 'users', uid, 'entries', this.editTargetId);
       await updateDoc(ref, { ...this.entry });
-      alert('更新しました！');
+      alert(this.t.msgUpdated);
       this.editTargetId = null;
     } else {
-      // 新規保存
       await addDoc(collection(db, 'users', uid, 'entries'), this.entry);
-      alert('保存しました！');
+      alert(this.t.msgSaved);
     }
     this.reset();
   }
@@ -111,7 +116,7 @@ export class Entries implements OnInit {
   async delete(id: string) {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    if (!confirm('削除しますか？')) return;
+    if (!confirm(this.t.msgConfirmDelete)) return;
     await deleteDoc(doc(db, 'users', uid, 'entries', id));
   }
 

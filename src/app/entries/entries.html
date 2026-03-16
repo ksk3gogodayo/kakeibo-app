@@ -1,18 +1,18 @@
 <div class="entries-form card">
-  <h2>{{ editTargetId ? '支出を編集' : '支出を登録' }}</h2>
+  <h2>{{ editTargetId ? t.editExpense : t.registerExpense }}</h2>
 
   <div class="field">
-    <label>品名</label>
-    <input [(ngModel)]="entry.title" placeholder="例：スーパーで買い物" />
+    <label>{{ t.itemName }}</label>
+    <input [(ngModel)]="entry.title" [placeholder]="t.itemNamePlaceholder" />
   </div>
 
   <div class="field">
-    <label>金額</label>
+    <label>{{ t.amount }}</label>
     <input type="number" [(ngModel)]="entry.amount" inputmode="numeric" />
   </div>
 
   <div class="field">
-    <label>カテゴリ</label>
+    <label>{{ t.category }}</label>
     <select [(ngModel)]="entry.category">
       @for (cat of categories; track cat) {
         <option [value]="cat">{{ cat }}</option>
@@ -21,7 +21,7 @@
   </div>
 
   <div class="field">
-    <label>決済方法</label>
+    <label>{{ t.paymentMethod }}</label>
     <select [(ngModel)]="entry.paymentMethod">
       @for (pm of paymentMethods; track pm) {
         <option [value]="pm">{{ pm }}</option>
@@ -30,7 +30,7 @@
   </div>
 
   <div class="field">
-    <label>引き落とし方法</label>
+    <label>{{ t.billingMethod }}</label>
     <select [(ngModel)]="entry.billingMethod">
       @for (bm of billingMethods; track bm) {
         <option [value]="bm">{{ bm }}</option>
@@ -39,25 +39,25 @@
   </div>
 
   <div class="field">
-    <label>日付</label>
+    <label>{{ t.date }}</label>
     <input type="date" [(ngModel)]="entry.date" />
   </div>
 
   <div class="form-actions">
-    <button class="btn-primary" (click)="save()">{{ editTargetId ? '更新' : '保存' }}</button>
+    <button class="btn-primary" (click)="save()">{{ editTargetId ? t.update : t.save }}</button>
     @if (editTargetId) {
-      <button class="btn-secondary" type="button" (click)="reset()">キャンセル</button>
+      <button class="btn-secondary" type="button" (click)="reset()">{{ t.cancel }}</button>
     }
   </div>
 </div>
 
 <div class="list-header">
-  <h2>支出一覧</h2>
-  <button class="btn-outline" (click)="exportCsv()" [disabled]="entryList.length === 0">CSVエクスポート</button>
+  <h2>{{ t.expenseList }}</h2>
+  <button class="btn-outline" (click)="exportCsv()" [disabled]="entryList.length === 0">{{ t.csvExport }}</button>
 </div>
 
 @if (entryList.length === 0) {
-  <p class="empty">まだ記録がありません</p>
+  <p class="empty">{{ t.noRecords }}</p>
 } @else {
   @for (e of entryList; track e.id) {
     <div class="entry-card card">
@@ -72,8 +72,8 @@
         <span>{{ e.billingMethod }}</span>
       </div>
       <div class="entry-actions">
-        <button class="btn-sm btn-secondary" (click)="edit(e)">編集</button>
-        <button class="btn-sm btn-danger" (click)="delete(e.id!)">削除</button>
+        <button class="btn-sm btn-secondary" (click)="edit(e)">{{ t.edit }}</button>
+        <button class="btn-sm btn-danger" (click)="delete(e.id!)">{{ t.delete }}</button>
       </div>
     </div>
   }

@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { doc, getDoc, setDoc } from 'firebase/firestore';
 import { db, auth } from '../firebase';
+import { LangService } from '../lang.service';
+import { Translations } from '../i18n';
 
 interface MasterData {
   categories: string[];
@@ -32,7 +34,14 @@ export class Settings implements OnInit {
   newPaymentMethod = '';
   newBillingMethod = '';
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  get t(): Translations {
+    return this.langService.t;
+  }
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private langService: LangService,
+  ) {}
 
   async ngOnInit() {
     const uid = auth.currentUser?.uid;
@@ -77,7 +86,7 @@ export class Settings implements OnInit {
 
   async deleteItem(list: 'categories' | 'paymentMethods' | 'billingMethods', index: number) {
     if (this[list].length <= 1) {
-      alert('最低1つは必要です');
+      alert(this.t.msgAtLeastOne);
       return;
     }
     this[list] = this[list].filter((_, i) => i !== index);

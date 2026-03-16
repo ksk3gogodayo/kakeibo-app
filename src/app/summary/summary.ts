@@ -3,6 +3,8 @@ import { CommonModule } from '@angular/common';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { Chart, registerables } from 'chart.js';
+import { LangService } from '../lang.service';
+import { Translations } from '../i18n';
 
 Chart.register(...registerables);
 
@@ -24,7 +26,14 @@ interface Entry {
 export class Summary implements OnInit {
   chart: Chart | null = null;
 
-  constructor(private cdr: ChangeDetectorRef) {}
+  get t(): Translations {
+    return this.langService.t;
+  }
+
+  constructor(
+    private cdr: ChangeDetectorRef,
+    private langService: LangService,
+  ) {}
 
   ngOnInit() {
     const uid = auth.currentUser?.uid;

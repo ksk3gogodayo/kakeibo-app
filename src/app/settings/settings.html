@@ -1,51 +1,51 @@
 <div class="settings">
-  <h2>マスターデータ設定</h2>
+  <h2>{{ t.masterDataSettings }}</h2>
 
   <section>
-    <h3>カテゴリ</h3>
+    <h3>{{ t.categories }}</h3>
     <ul>
       @for (item of categories; track item; let i = $index) {
         <li>
           <span>{{ item }}</span>
-          <button (click)="deleteItem('categories', i)">削除</button>
+          <button (click)="deleteItem('categories', i)">{{ t.delete }}</button>
         </li>
       }
     </ul>
     <div class="add-row">
-      <input [(ngModel)]="newCategory" placeholder="新しいカテゴリ" />
-      <button (click)="addItem('categories', newCategory)">追加</button>
+      <input [(ngModel)]="newCategory" [placeholder]="t.newCategory" />
+      <button (click)="addItem('categories', newCategory)">{{ t.add }}</button>
     </div>
   </section>
 
   <section>
-    <h3>決済方法</h3>
+    <h3>{{ t.paymentMethods }}</h3>
     <ul>
       @for (item of paymentMethods; track item; let i = $index) {
         <li>
           <span>{{ item }}</span>
-          <button (click)="deleteItem('paymentMethods', i)">削除</button>
+          <button (click)="deleteItem('paymentMethods', i)">{{ t.delete }}</button>
         </li>
       }
     </ul>
     <div class="add-row">
-      <input [(ngModel)]="newPaymentMethod" placeholder="新しい決済方法" />
-      <button (click)="addItem('paymentMethods', newPaymentMethod)">追加</button>
+      <input [(ngModel)]="newPaymentMethod" [placeholder]="t.newPaymentMethod" />
+      <button (click)="addItem('paymentMethods', newPaymentMethod)">{{ t.add }}</button>
     </div>
   </section>
 
   <section>
-    <h3>引き落とし方法</h3>
+    <h3>{{ t.billingMethods }}</h3>
     <ul>
       @for (item of billingMethods; track item; let i = $index) {
         <li>
           <span>{{ item }}</span>
-          <button (click)="deleteItem('billingMethods', i)">削除</button>
+          <button (click)="deleteItem('billingMethods', i)">{{ t.delete }}</button>
         </li>
       }
     </ul>
     <div class="add-row">
-      <input [(ngModel)]="newBillingMethod" placeholder="新しい引き落とし方法" />
-      <button (click)="addItem('billingMethods', newBillingMethod)">追加</button>
+      <input [(ngModel)]="newBillingMethod" [placeholder]="t.newBillingMethod" />
+      <button (click)="addItem('billingMethods', newBillingMethod)">{{ t.add }}</button>
     </div>
   </section>
 </div>

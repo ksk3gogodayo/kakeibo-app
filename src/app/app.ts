@@ -6,6 +6,8 @@ import { auth } from './firebase';
 import { Entries } from './entries/entries';
 import { Summary } from './summary/summary';
 import { Settings } from './settings/settings';
+import { LangService } from './lang.service';
+import { Lang } from './i18n';
 
 @Component({
   selector: 'app-root',
@@ -19,12 +21,20 @@ export class AppComponent {
   loading = true;
   activeTab: 'entries' | 'summary' | 'settings' = 'entries';
 
-  constructor(private cdr: ChangeDetectorRef) {
+  constructor(
+    private cdr: ChangeDetectorRef,
+    public lang: LangService,
+  ) {
     onAuthStateChanged(auth, (u) => {
       this.user = u;
       this.loading = false;
       this.cdr.detectChanges();
     });
+  }
+
+  setLang(l: Lang): void {
+    this.lang.setLang(l);
+    this.cdr.detectChanges();
   }
 
   async logout() {
