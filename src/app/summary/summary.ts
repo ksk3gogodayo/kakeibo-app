@@ -13,7 +13,15 @@ interface Entry {
   title: string;
   amount: number;
   category: string;
+  billingMethod: string;
   date: string;
+}
+
+interface BillingGroup {
+  method: string;
+  total: number;
+  entries: Entry[];
+  expanded: boolean;
 }
 
 @Component({
@@ -25,9 +33,34 @@ interface Entry {
 })
 export class Summary implements OnInit {
   chart: Chart | null = null;
+  allEntries: Entry[] = [];
+  selectedMonth = new Date().toISOString().slice(0, 7);
+  billingGroups: BillingGroup[] = [];
 
   get t(): Translations {
     return this.langService.t;
+  }
+
+  get displayMonth(): string {
+    const [y, m] = this.selectedMonth.split('-').map(Number);
+    const date = new Date(y, m - 1);
+    const locale =
+      this.langService.lang === 'ja' ? 'ja-JP'
+      : this.langService.lang === 'en' ? 'en-US'
+      : 'fil-PH';
+    return date.toLocaleDateString(locale, { year: 'numeric', month: 'long' });
+  }
+
+  get isCurrentMonth(): boolean {
+    return this.selectedMonth === new Date().toISOString().slice(0, 7);
+  }
+
+  get filteredEntries(): Entry[] {
+    return this.allEntries.filter((e) => e.date?.startsWith(this.selectedMonth));
+  }
+
+  get monthTotal(): number {
+    return this.filteredEntries.reduce((sum, e) => sum + e.amount, 0);
   }
 
   constructor(
@@ -38,20 +71,62 @@ export class Summary implements OnInit {
   ngOnInit() {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    const ref = collection(db, 'users', uid, 'entries');
-    onSnapshot(ref, (snapshot) => {
-      const entries = snapshot.docs.map((d) => d.data()) as Entry[];
-      this.buildChart(entries);
+    onSnapshot(collection(db, 'users', uid, 'entries'), (snapshot) => {
+      this.allEntries = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as Entry[];
+      this.refresh();
       this.cdr.detectChanges();
     });
   }
 
-  buildChart(entries: Entry[]) {
-    const currentMonth = new Date().toISOString().slice(0, 7);
-    const filtered = entries.filter((e) => e.date?.startsWith(currentMonth));
+  prevMonth() {
+    const [y, m] = this.selectedMonth.split('-').map(Number);
+    const d = new Date(y, m - 2);
+    this.selectedMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    this.refresh();
+    this.cdr.detectChanges();
+  }
 
+  nextMonth() {
+    const [y, m] = this.selectedMonth.split('-').map(Number);
+    const d = new Date(y, m);
+    this.selectedMonth = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`;
+    this.refresh();
+    this.cdr.detectChanges();
+  }
+
+  toggleGroup(index: number) {
+    this.billingGroups[index].expanded = !this.billingGroups[index].expanded;
+  }
+
+  private refresh() {
+    const filtered = this.filteredEntries;
+    this.buildChart(filtered);
+    this.buildBillingGroups(filtered);
+  }
+
+  private buildBillingGroups(entries: Entry[]) {
+    const map = new Map<string, Entry[]>();
+    entries.forEach((e) => {
+      const key = e.billingMethod || 'その他';
+      if (!map.has(key)) map.set(key, []);
+      map.get(key)!.push(e);
+    });
+
+    const prevExpanded = new Map(this.billingGroups.map((g) => [g.method, g.expanded]));
+
+    this.billingGroups = Array.from(map.entries())
+      .map(([method, items]) => ({
+        method,
+        total: items.reduce((sum, e) => sum + e.amount, 0),
+        entries: [...items].sort((a, b) => a.date.localeCompare(b.date)),
+        expanded: prevExpanded.get(method) ?? false,
+      }))
+      .sort((a, b) => b.total - a.total);
+  }
+
+  private buildChart(entries: Entry[]) {
     const categoryTotals: { [key: string]: number } = {};
-    filtered.forEach((e) => {
+    entries.forEach((e) => {
       categoryTotals[e.category] = (categoryTotals[e.category] || 0) + e.amount;
     });
 
@@ -71,14 +146,8 @@ export class Summary implements OnInit {
           {
             data,
             backgroundColor: [
-              '#FF6384',
-              '#36A2EB',
-              '#FFCE56',
-              '#4BC0C0',
-              '#9966FF',
-              '#FF9F40',
-              '#FF6384',
-              '#C9CBCF',
+              '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
+              '#9966FF', '#FF9F40', '#C9CBCF', '#7BC8A4',
             ],
           },
         ],

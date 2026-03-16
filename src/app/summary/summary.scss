@@ -2,17 +2,147 @@
   display: block;
 }
 
-div {
-  background: var(--color-surface);
-  border-radius: var(--radius);
-  padding: 16px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.06);
+.month-nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 
-  h2 {
-    margin-bottom: 16px;
+  .nav-btn {
+    width: 40px;
+    height: 40px;
+    font-size: 1.75rem;
+    line-height: 1;
+    background: none;
+    border: 1px solid var(--color-border);
+    border-radius: var(--radius-sm);
+    color: var(--color-text);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &:disabled {
+      opacity: 0.3;
+    }
+
+    &:active:not(:disabled) {
+      background: var(--color-bg);
+    }
   }
 
-  canvas {
-    max-height: 320px;
+  .month-label {
+    font-size: 1.125rem;
+    font-weight: 700;
+  }
+}
+
+.section-header {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  margin-bottom: 16px;
+
+  .month-total {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+}
+
+canvas {
+  max-height: 300px;
+}
+
+.empty {
+  text-align: center;
+  color: var(--color-muted);
+  padding: 24px 0;
+}
+
+/* 引き落とし方法別 */
+.billing-group {
+  border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.group-header {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 4px;
+  background: none;
+  border: none;
+  text-align: left;
+  gap: 8px;
+
+  &:active {
+    background: var(--color-bg);
+  }
+
+  .group-method {
+    font-weight: 600;
+    font-size: 0.9375rem;
+  }
+
+  .group-right {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .group-total {
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+
+  .group-chevron {
+    font-size: 1.25rem;
+    color: var(--color-muted);
+    transition: transform 0.2s;
+    display: inline-block;
+
+    &.open {
+      transform: rotate(90deg);
+    }
+  }
+}
+
+.group-entries {
+  background: var(--color-bg);
+  border-radius: var(--radius-sm);
+  margin-bottom: 8px;
+  overflow: hidden;
+}
+
+.entry-row {
+  display: grid;
+  grid-template-columns: 6em 1fr auto;
+  gap: 8px;
+  align-items: center;
+  padding: 8px 12px;
+  font-size: 0.875rem;
+  border-bottom: 1px solid var(--color-border);
+
+  &:last-child {
+    border-bottom: none;
+  }
+
+  .entry-date {
+    color: var(--color-muted);
+    white-space: nowrap;
+  }
+
+  .entry-amount {
+    font-weight: 600;
+    white-space: nowrap;
+  }
+
+  &.subtotal {
+    font-weight: 700;
+    background: var(--color-surface);
+    color: var(--color-primary);
   }
 }

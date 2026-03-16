@@ -37,6 +37,8 @@ export interface Translations {
   newPaymentMethod: string;
   newBillingMethod: string;
   msgAtLeastOne: string;
+  billingBreakdown: string;
+  total: string;
 }
 
 export const translations: Record<Lang, Translations> = {
@@ -83,6 +85,8 @@ export const translations: Record<Lang, Translations> = {
     newPaymentMethod: '新しい決済方法',
     newBillingMethod: '新しい引き落とし方法',
     msgAtLeastOne: '最低1つは必要です',
+    billingBreakdown: '引き落とし方法別',
+    total: '合計',
   },
 
   en: {
@@ -128,6 +132,8 @@ export const translations: Record<Lang, Translations> = {
     newPaymentMethod: 'New payment method',
     newBillingMethod: 'New billing method',
     msgAtLeastOne: 'At least one item is required',
+    billingBreakdown: 'By Billing Method',
+    total: 'Total',
   },
 
   fil: {
@@ -173,5 +179,7 @@ export const translations: Record<Lang, Translations> = {
     newPaymentMethod: 'Bagong paraan ng bayad',
     newBillingMethod: 'Bagong paraan ng singil',
     msgAtLeastOne: 'Kailangan ng kahit isang aytem',
+    billingBreakdown: 'Ayon sa Paraan ng Singil',
+    total: 'Kabuuan',
   },
 };

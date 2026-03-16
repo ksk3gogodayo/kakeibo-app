@@ -1,4 +1,57 @@
-<div>
-  <h2>{{ t.monthlySummary }}</h2>
-  <canvas id="summaryChart"></canvas>
+<!-- 月切り替え -->
+<div class="month-nav card">
+  <button class="nav-btn" (click)="prevMonth()">&#8249;</button>
+  <span class="month-label">{{ displayMonth }}</span>
+  <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth">&#8250;</button>
+</div>
+
+<!-- カテゴリ別円グラフ -->
+<div class="card">
+  <div class="section-header">
+    <h2>{{ t.monthlySummary }}</h2>
+    <span class="month-total">¥{{ monthTotal | number }}</span>
+  </div>
+  @if (filteredEntries.length === 0) {
+    <p class="empty">{{ t.noRecords }}</p>
+  } @else {
+    <canvas id="summaryChart"></canvas>
+  }
+</div>
+
+<!-- 引き落とし方法別 -->
+<div class="card">
+  <h2>{{ t.billingBreakdown }}</h2>
+
+  @if (billingGroups.length === 0) {
+    <p class="empty">{{ t.noRecords }}</p>
+  } @else {
+    @for (group of billingGroups; track group.method; let i = $index) {
+      <div class="billing-group">
+        <button class="group-header" (click)="toggleGroup(i)">
+          <span class="group-method">{{ group.method }}</span>
+          <span class="group-right">
+            <span class="group-total">¥{{ group.total | number }}</span>
+            <span class="group-chevron" [class.open]="group.expanded">›</span>
+          </span>
+        </button>
+
+        @if (group.expanded) {
+          <div class="group-entries">
+            @for (e of group.entries; track e.id) {
+              <div class="entry-row">
+                <span class="entry-date">{{ e.date }}</span>
+                <span class="entry-title">{{ e.title }}</span>
+                <span class="entry-amount">¥{{ e.amount | number }}</span>
+              </div>
+            }
+            <div class="entry-row subtotal">
+              <span></span>
+              <span>{{ t.total }}</span>
+              <span>¥{{ group.total | number }}</span>
+            </div>
+          </div>
+        }
+      </div>
+    }
+  }
 </div>
