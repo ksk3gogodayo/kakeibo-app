@@ -39,7 +39,10 @@
 
 <hr />
 
-<h2>支出一覧</h2>
+<div style="display:flex; align-items:center; gap:16px; margin-bottom:8px;">
+  <h2 style="margin:0">支出一覧</h2>
+  <button (click)="exportCsv()" [disabled]="entryList.length === 0">CSVエクスポート</button>
+</div>
 @if (entryList.length === 0) {
   <p>まだ記録がありません</p>
 } @else {

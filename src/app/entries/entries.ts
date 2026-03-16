@@ -89,6 +89,25 @@ export class Entries implements OnInit {
     this.reset();
   }
 
+  exportCsv() {
+    const header = ['日付', '品名', '金額', 'カテゴリ', '決済方法', '引き落とし方法'];
+    const rows = [...this.entryList]
+      .sort((a, b) => a.date.localeCompare(b.date))
+      .map((e) => [e.date, e.title, e.amount, e.category, e.paymentMethod, e.billingMethod]);
+
+    const csv = [header, ...rows]
+      .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
+      .join('\r\n');
+
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `kakeibo_${new Date().toISOString().split('T')[0]}.csv`;
+    a.click();
+    URL.revokeObjectURL(url);
+  }
+
   async delete(id: string) {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
