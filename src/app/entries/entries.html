@@ -1,5 +1,5 @@
 <div class="entries-form">
-  <h2>支出を登録</h2>
+  <h2>{{ editTargetId ? '支出を編集' : '支出を登録' }}</h2>
 
   <label>品名</label>
   <input [(ngModel)]="entry.title" placeholder="例：スーパーで買い物" />
@@ -31,7 +31,10 @@
   <label>日付</label>
   <input type="date" [(ngModel)]="entry.date" />
 
-  <button (click)="save()">保存</button>
+  <button (click)="save()">{{ editTargetId ? '更新' : '保存' }}</button>
+  @if (editTargetId) {
+    <button type="button" (click)="reset()">キャンセル</button>
+  }
 </div>
 
 <hr />
@@ -41,10 +44,11 @@
   <p>まだ記録がありません</p>
 } @else {
   @for (e of entryList; track e.id) {
-    <div style="border: 1px solid #ccc; padding: 8px; margin-bottom: 8px; border-radius: 4px;">
-      <p>📅 {{ e.date }} | {{ e.title }} | ¥{{ e.amount }}</p>
-      <p>🏷 {{ e.category }} | 💳 {{ e.paymentMethod }} | 🏦 {{ e.billingMethod }}</p>
-      <button (click)="delete(e.id!)">削除</button>
-    </div>
+  <div style="border: 1px solid #ccc; padding: 8px; margin-bottom: 8px; border-radius: 4px;">
+    <p>📅 {{ e.date }} | {{ e.title }} | ¥{{ e.amount }}</p>
+    <p>🏷 {{ e.category }} | 💳 {{ e.paymentMethod }} | 🏦 {{ e.billingMethod }}</p>
+    <button (click)="edit(e)">編集</button>
+    <button (click)="delete(e.id!)">削除</button>
+  </div>
   }
 }
