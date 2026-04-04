@@ -22,6 +22,7 @@ https://kakeibo-app-xi.vercel.app
 | Database       | **Firestore**                       | ユーザーごとのデータ分離設計                |
 | グラフ         | **Chart.js**                        | 月ごとの集計を円グラフで可視化              |
 | Hosting / CI   | **Vercel**                          | GitHub push → 自動デプロイ                  |
+| スタイル       | **SCSS (Sass)**                     | ネスト・変数でコンポーネントスタイルを管理  |
 
 ## 📝 機能一覧（実装済み）
 
