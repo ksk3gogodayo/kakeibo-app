@@ -1,4 +1,4 @@
-import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
+import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase';
@@ -15,6 +15,7 @@ interface Entry {
   category: string;
   billingMethod: string;
   date: string;
+  type?: 'income' | 'expense';
 }
 
 interface BillingGroup {
@@ -24,6 +25,20 @@ interface BillingGroup {
   expanded: boolean;
 }
 
+interface DailyGroup {
+  date: string;
+  income: number;
+  expense: number;
+  balance: number;
+  entries: Entry[];
+  expanded: boolean;
+}
+
+function currentMonth(): string {
+  const now = new Date();
+  return `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+}
+
 @Component({
   selector: 'app-summary',
   standalone: true,
@@ -31,11 +46,14 @@ interface BillingGroup {
   templateUrl: './summary.html',
   styleUrl: './summary.scss',
 })
-export class Summary implements OnInit {
+export class Summary implements OnInit, OnDestroy {
   chart: Chart | null = null;
   allEntries: Entry[] = [];
-  selectedMonth = new Date().toISOString().slice(0, 7);
+  selectedMonth = currentMonth();
   billingGroups: BillingGroup[] = [];
+  dailyGroups: DailyGroup[] = [];
+  viewMode: 'monthly' | 'daily' = 'monthly';
+  private unsubscribe?: () => void;
 
   get t(): Translations {
     return this.langService.t;
@@ -45,22 +63,28 @@ export class Summary implements OnInit {
     const [y, m] = this.selectedMonth.split('-').map(Number);
     const date = new Date(y, m - 1);
     const locale =
-      this.langService.lang === 'ja' ? 'ja-JP'
-      : this.langService.lang === 'en' ? 'en-US'
-      : 'fil-PH';
+      this.langService.lang === 'ja'
+        ? 'ja-JP'
+        : this.langService.lang === 'en'
+          ? 'en-US'
+          : 'fil-PH';
     return date.toLocaleDateString(locale, { year: 'numeric', month: 'long' });
   }
 
   get isCurrentMonth(): boolean {
-    return this.selectedMonth === new Date().toISOString().slice(0, 7);
+    return this.selectedMonth === currentMonth();
   }
 
   get filteredEntries(): Entry[] {
     return this.allEntries.filter((e) => e.date?.startsWith(this.selectedMonth));
   }
 
+  get expenseEntries(): Entry[] {
+    return this.filteredEntries.filter((e) => e.type !== 'income');
+  }
+
   get monthTotal(): number {
-    return this.filteredEntries.reduce((sum, e) => sum + e.amount, 0);
+    return this.expenseEntries.reduce((sum, e) => sum + e.amount, 0);
   }
 
   constructor(
@@ -71,10 +95,40 @@ export class Summary implements OnInit {
   ngOnInit() {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
-    onSnapshot(collection(db, 'users', uid, 'entries'), (snapshot) => {
+    this.unsubscribe = onSnapshot(collection(db, 'users', uid, 'entries'), (snapshot) => {
       this.allEntries = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as Entry[];
       this.refresh();
       this.cdr.detectChanges();
+    });
+  }
+
+  ngOnDestroy() {
+    this.unsubscribe?.();
+    this.chart?.destroy();
+  }
+
+  setView(mode: 'monthly' | 'daily') {
+    this.viewMode = mode;
+    this.cdr.detectChanges();
+    this.buildChart(this.filteredEntries.filter((e) => e.type !== 'income'));
+  }
+
+  toggleDay(group: DailyGroup) {
+    group.expanded = !group.expanded;
+  }
+
+  displayDay(value: string): string {
+    const [year, month, day] = value.split('-').map(Number);
+    const locale =
+      this.langService.lang === 'ja'
+        ? 'ja-JP'
+        : this.langService.lang === 'en'
+          ? 'en-US'
+          : 'fil-PH';
+    return new Date(year, month - 1, day).toLocaleDateString(locale, {
+      month: 'long',
+      day: 'numeric',
+      weekday: 'short',
     });
   }
 
@@ -100,8 +154,36 @@ export class Summary implements OnInit {
 
   private refresh() {
     const filtered = this.filteredEntries;
-    this.buildChart(filtered);
-    this.buildBillingGroups(filtered);
+    const expenses = filtered.filter((e) => e.type !== 'income');
+    this.buildBillingGroups(expenses);
+    const expanded = new Set(this.dailyGroups.filter((g) => g.expanded).map((g) => g.date));
+    const days = new Map<string, Entry[]>();
+    for (const entry of filtered) {
+      const items = days.get(entry.date) ?? [];
+      items.push(entry);
+      days.set(entry.date, items);
+    }
+    this.dailyGroups = [...days]
+      .sort(([a], [b]) => b.localeCompare(a))
+      .map(([date, entries]) => {
+        const income = entries
+          .filter((e) => e.type === 'income')
+          .reduce((sum, e) => sum + e.amount, 0);
+        const expense = entries
+          .filter((e) => e.type !== 'income')
+          .reduce((sum, e) => sum + e.amount, 0);
+        return {
+          date,
+          entries,
+          income,
+          expense,
+          balance: income - expense,
+          expanded: expanded.has(date),
+        };
+      });
+    // Render conditional canvases before Chart.js accesses them (including the first snapshot).
+    this.cdr.detectChanges();
+    this.buildChart(expenses);
   }
 
   private buildBillingGroups(entries: Entry[]) {
@@ -133,7 +215,9 @@ export class Summary implements OnInit {
     const labels = Object.keys(categoryTotals);
     const data = Object.values(categoryTotals);
 
-    if (this.chart) this.chart.destroy();
+    this.chart?.destroy();
+    this.chart = null;
+    if (this.viewMode !== 'monthly') return;
 
     const canvas = document.getElementById('summaryChart') as HTMLCanvasElement;
     if (!canvas) return;
@@ -146,8 +230,14 @@ export class Summary implements OnInit {
           {
             data,
             backgroundColor: [
-              '#FF6384', '#36A2EB', '#FFCE56', '#4BC0C0',
-              '#9966FF', '#FF9F40', '#C9CBCF', '#7BC8A4',
+              '#FF6384',
+              '#36A2EB',
+              '#FFCE56',
+              '#4BC0C0',
+              '#9966FF',
+              '#FF9F40',
+              '#C9CBCF',
+              '#7BC8A4',
             ],
           },
         ],

@@ -27,6 +27,12 @@ export interface Translations {
   msgSaved: string;
   msgUpdated: string;
   msgConfirmDelete: string;
+  transactionType: string;
+  monthly: string;
+  daily: string;
+  income: string;
+  expense: string;
+  balance: string;
   monthlySummary: string;
   masterDataSettings: string;
   categories: string;
@@ -51,8 +57,8 @@ export const translations: Record<Lang, Translations> = {
     tabSummary: '集計',
     tabSettings: '設定',
     // フォーム
-    registerExpense: '支出を登録',
-    editExpense: '支出を編集',
+    registerExpense: '取引を登録',
+    editExpense: '取引を編集',
     itemName: '品名',
     itemNamePlaceholder: '例：スーパーで買い物',
     amount: '金額',
@@ -64,7 +70,7 @@ export const translations: Record<Lang, Translations> = {
     update: '更新',
     cancel: 'キャンセル',
     // 一覧
-    expenseList: '支出一覧',
+    expenseList: '取引一覧',
     edit: '編集',
     delete: '削除',
     csvExport: 'CSVエクスポート',
@@ -74,6 +80,12 @@ export const translations: Record<Lang, Translations> = {
     msgUpdated: '更新しました！',
     msgConfirmDelete: '削除しますか？',
     // 集計
+    transactionType: '収支区分',
+    monthly: '月別',
+    daily: '日別',
+    income: '収入',
+    expense: '支出',
+    balance: '差額',
     monthlySummary: '今月の支出（カテゴリ別）',
     // 設定
     masterDataSettings: 'マスターデータ設定',
@@ -98,8 +110,8 @@ export const translations: Record<Lang, Translations> = {
     tabSummary: 'Summary',
     tabSettings: 'Settings',
     // form
-    registerExpense: 'Add Expense',
-    editExpense: 'Edit Expense',
+    registerExpense: 'Add Transaction',
+    editExpense: 'Edit Transaction',
     itemName: 'Item',
     itemNamePlaceholder: 'e.g. Grocery shopping',
     amount: 'Amount',
@@ -111,7 +123,7 @@ export const translations: Record<Lang, Translations> = {
     update: 'Update',
     cancel: 'Cancel',
     // list
-    expenseList: 'Expense List',
+    expenseList: 'Transaction List',
     edit: 'Edit',
     delete: 'Delete',
     csvExport: 'Export CSV',
@@ -121,6 +133,12 @@ export const translations: Record<Lang, Translations> = {
     msgUpdated: 'Updated!',
     msgConfirmDelete: 'Are you sure you want to delete?',
     // summary
+    transactionType: 'Transaction type',
+    monthly: 'Monthly',
+    daily: 'Daily',
+    income: 'Income',
+    expense: 'Expense',
+    balance: 'Balance',
     monthlySummary: 'This Month (by Category)',
     // settings
     masterDataSettings: 'Master Data Settings',
@@ -145,8 +163,8 @@ export const translations: Record<Lang, Translations> = {
     tabSummary: 'Buod',
     tabSettings: 'Mga Setting',
     // form
-    registerExpense: 'Magdagdag ng Gastos',
-    editExpense: 'I-edit ang Gastos',
+    registerExpense: 'Magdagdag ng Transaksyon',
+    editExpense: 'I-edit ang Transaksyon',
     itemName: 'Pangalan ng Item',
     itemNamePlaceholder: 'hal. Pamimili sa supermarket',
     amount: 'Halaga',
@@ -158,7 +176,7 @@ export const translations: Record<Lang, Translations> = {
     update: 'I-update',
     cancel: 'Kanselahin',
     // list
-    expenseList: 'Listahan ng Gastos',
+    expenseList: 'Listahan ng Transaksyon',
     edit: 'I-edit',
     delete: 'Tanggalin',
     csvExport: 'I-export ang CSV',
@@ -168,6 +186,12 @@ export const translations: Record<Lang, Translations> = {
     msgUpdated: 'Na-update na!',
     msgConfirmDelete: 'Sigurado ka bang tanggalin ito?',
     // summary
+    transactionType: 'Uri ng transaksyon',
+    monthly: 'Buwanan',
+    daily: 'Araw-araw',
+    income: 'Kita',
+    expense: 'Gastos',
+    balance: 'Balanse',
     monthlySummary: 'Gastos ngayong buwan (ayon sa kategorya)',
     // settings
     masterDataSettings: 'Mga Master Data Setting',
