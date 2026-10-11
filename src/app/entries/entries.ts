@@ -38,6 +38,18 @@ export class Entries implements OnInit {
 
   editTargetId: string | null = null;
   entryList: Entry[] = [];
+  sortOrder = 'date-desc';
+
+  get sortedEntries(): Entry[] {
+    const [field, direction] = this.sortOrder.split('-');
+    const sign = direction === 'asc' ? 1 : -1;
+    return [...this.entryList].sort((a, b) => {
+      const comparison = field === 'amount' ? a.amount - b.amount : a.date.localeCompare(b.date);
+      return (
+        sign * comparison || b.date.localeCompare(a.date) || (a.id ?? '').localeCompare(b.id ?? '')
+      );
+    });
+  }
   categories: string[] = [...MASTER_DEFAULTS.categories];
   paymentMethods: string[] = [...MASTER_DEFAULTS.paymentMethods];
   billingMethods: string[] = [...MASTER_DEFAULTS.billingMethods];

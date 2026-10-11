@@ -66,10 +66,20 @@
   </button>
 </div>
 
+<div class="field">
+  <label for="entries-sort">{{ t.sortBy }}</label>
+  <select id="entries-sort" [(ngModel)]="sortOrder">
+    <option value="date-desc">{{ t.dateNewest }}</option>
+    <option value="date-asc">{{ t.dateOldest }}</option>
+    <option value="amount-desc">{{ t.amountHighest }}</option>
+    <option value="amount-asc">{{ t.amountLowest }}</option>
+  </select>
+</div>
+
 @if (entryList.length === 0) {
   <p class="empty">{{ t.noRecords }}</p>
 } @else {
-  @for (e of entryList; track e.id) {
+  @for (e of sortedEntries; track e.id) {
     <div class="entry-card card">
       <div class="entry-main">
         <span class="entry-title">{{ e.title }}</span>

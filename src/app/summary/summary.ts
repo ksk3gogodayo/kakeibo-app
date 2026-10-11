@@ -1,5 +1,6 @@
 import { Component, OnInit, OnDestroy, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { collection, onSnapshot } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { Chart, registerables } from 'chart.js';
@@ -42,7 +43,7 @@ function currentMonth(): string {
 @Component({
   selector: 'app-summary',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './summary.html',
   styleUrl: './summary.scss',
 })
@@ -52,6 +53,23 @@ export class Summary implements OnInit, OnDestroy {
   selectedMonth = currentMonth();
   billingGroups: BillingGroup[] = [];
   dailyGroups: DailyGroup[] = [];
+  sortOrder = 'date-desc';
+
+  get sortedDailyGroups(): DailyGroup[] {
+    const [field, direction] = this.sortOrder.split('-');
+    const sign = direction === 'asc' ? 1 : -1;
+    return [...this.dailyGroups].sort((a, b) => {
+      const comparison =
+        field === 'income'
+          ? a.income - b.income
+          : field === 'expense'
+            ? a.expense - b.expense
+            : field === 'balance'
+              ? a.balance - b.balance
+              : a.date.localeCompare(b.date);
+      return sign * comparison || b.date.localeCompare(a.date);
+    });
+  }
   viewMode: 'monthly' | 'daily' = 'monthly';
   private unsubscribe?: () => void;
 

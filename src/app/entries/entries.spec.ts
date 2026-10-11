@@ -73,4 +73,36 @@ describe('Entries', () => {
     await component.delete('old');
     expect(deleteDoc).toHaveBeenCalledWith('document');
   });
+  it('sorts dates and numeric amounts without mutating stored order', () => {
+    component.entryList = [
+      { ...legacy, id: 'a', date: '2026-10-01', amount: 100 },
+      { ...legacy, id: 'b', date: '2026-10-03', amount: -20 },
+      { ...legacy, id: 'c', date: '2026-10-02', amount: 9 },
+    ];
+    for (const [order, ids] of [
+      ['date-desc', ['b', 'c', 'a']], ['date-asc', ['a', 'c', 'b']],
+      ['amount-desc', ['a', 'c', 'b']], ['amount-asc', ['b', 'c', 'a']],
+    ] as const) {
+      component.sortOrder = order;
+      expect(component.sortedEntries.map(e => e.id)).toEqual(ids);
+    }
+    expect(component.entryList.map(e => e.id)).toEqual(['a', 'b', 'c']);
+    component.entryList = [];
+    expect(component.sortedEntries).toEqual([]);
+  });
+
+  it('changes visible order through the selector and edits the selected record', async () => {
+    component.entryList = [
+      { ...legacy, id: 'a', title: 'Large', amount: 100 },
+      { ...legacy, id: 'b', title: 'Small', amount: 9 },
+    ];
+    fixture.changeDetectorRef.markForCheck(); fixture.detectChanges();
+    const select = fixture.nativeElement.querySelector('#entries-sort') as HTMLSelectElement;
+    select.value = 'amount-asc'; select.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('.entry-card .entry-title').textContent).toContain('Small');
+    fixture.nativeElement.querySelector('.entry-card .entry-actions button').click();
+    expect(component.editTargetId).toBe('b');
+  });
+
 });
