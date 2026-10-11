@@ -15,6 +15,7 @@ interface Entry {
   paymentMethod: string;
   billingMethod: string;
   date: string;
+  type?: 'income' | 'expense';
 }
 
 @Component({
@@ -26,6 +27,7 @@ interface Entry {
 })
 export class Entries implements OnInit {
   entry: Entry = {
+    type: 'expense',
     title: '',
     amount: 0,
     category: MASTER_DEFAULTS.categories[0],
@@ -74,7 +76,7 @@ export class Entries implements OnInit {
 
   edit(e: Entry) {
     this.editTargetId = e.id!;
-    this.entry = { ...e };
+    this.entry = { ...e, type: e.type ?? 'expense' };
     this.cdr.detectChanges();
   }
 
@@ -95,10 +97,18 @@ export class Entries implements OnInit {
   }
 
   exportCsv() {
-    const header = ['日付', '品名', '金額', 'カテゴリ', '決済方法', '引き落とし方法'];
+    const header = ['日付', '品名', '金額', 'カテゴリ', '決済方法', '引き落とし方法', '収支区分'];
     const rows = [...this.entryList]
       .sort((a, b) => a.date.localeCompare(b.date))
-      .map((e) => [e.date, e.title, e.amount, e.category, e.paymentMethod, e.billingMethod]);
+      .map((e) => [
+        e.date,
+        e.title,
+        e.amount,
+        e.category,
+        e.paymentMethod,
+        e.billingMethod,
+        e.type === 'income' ? '収入' : '支出',
+      ]);
 
     const csv = [header, ...rows]
       .map((row) => row.map((cell) => `"${String(cell).replace(/"/g, '""')}"`).join(','))
@@ -122,6 +132,7 @@ export class Entries implements OnInit {
 
   reset() {
     this.entry = {
+      type: 'expense',
       title: '',
       amount: 0,
       category: this.categories[0] ?? '',

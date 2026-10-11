@@ -5,53 +5,111 @@
   <button class="nav-btn" (click)="nextMonth()" [disabled]="isCurrentMonth">&#8250;</button>
 </div>
 
-<!-- カテゴリ別円グラフ -->
-<div class="card">
-  <div class="section-header">
-    <h2>{{ t.monthlySummary }}</h2>
-    <span class="month-total">¥{{ monthTotal | number }}</span>
-  </div>
-  @if (filteredEntries.length === 0) {
-    <p class="empty">{{ t.noRecords }}</p>
-  } @else {
-    <canvas id="summaryChart"></canvas>
-  }
+<div class="view-switch" role="group" [attr.aria-label]="t.tabSummary">
+  <button type="button" [attr.aria-pressed]="viewMode === 'monthly'" (click)="setView('monthly')">
+    {{ t.monthly }}
+  </button>
+  <button type="button" [attr.aria-pressed]="viewMode === 'daily'" (click)="setView('daily')">
+    {{ t.daily }}
+  </button>
 </div>
 
-<!-- 引き落とし方法別 -->
-<div class="card">
-  <h2>{{ t.billingBreakdown }}</h2>
-
-  @if (billingGroups.length === 0) {
-    <p class="empty">{{ t.noRecords }}</p>
-  } @else {
-    @for (group of billingGroups; track group.method; let i = $index) {
-      <div class="billing-group">
-        <button class="group-header" (click)="toggleGroup(i)">
-          <span class="group-method">{{ group.method }}</span>
-          <span class="group-right">
-            <span class="group-total">¥{{ group.total | number }}</span>
-            <span class="group-chevron" [class.open]="group.expanded">›</span>
-          </span>
-        </button>
-
-        @if (group.expanded) {
-          <div class="group-entries">
-            @for (e of group.entries; track e.id) {
-              <div class="entry-row">
-                <span class="entry-date">{{ e.date }}</span>
-                <span class="entry-title">{{ e.title }}</span>
-                <span class="entry-amount">¥{{ e.amount | number }}</span>
-              </div>
-            }
-            <div class="entry-row subtotal">
-              <span></span>
-              <span>{{ t.total }}</span>
-              <span>¥{{ group.total | number }}</span>
-            </div>
-          </div>
-        }
-      </div>
+@if (viewMode === 'monthly') {
+  <!-- カテゴリ別円グラフ -->
+  <div class="card">
+    <div class="section-header">
+      <h2>{{ t.monthlySummary }}</h2>
+      <span class="month-total">¥{{ monthTotal | number }}</span>
+    </div>
+    @if (expenseEntries.length === 0) {
+      <p class="empty">{{ t.noRecords }}</p>
+    } @else {
+      <canvas id="summaryChart"></canvas>
     }
-  }
-</div>
+  </div>
+
+  <!-- 引き落とし方法別 -->
+  <div class="card">
+    <h2>{{ t.billingBreakdown }}</h2>
+
+    @if (billingGroups.length === 0) {
+      <p class="empty">{{ t.noRecords }}</p>
+    } @else {
+      @for (group of billingGroups; track group.method; let i = $index) {
+        <div class="billing-group">
+          <button class="group-header" (click)="toggleGroup(i)">
+            <span class="group-method">{{ group.method }}</span>
+            <span class="group-right">
+              <span class="group-total">¥{{ group.total | number }}</span>
+              <span class="group-chevron" [class.open]="group.expanded">›</span>
+            </span>
+          </button>
+
+          @if (group.expanded) {
+            <div class="group-entries">
+              @for (e of group.entries; track e.id) {
+                <div class="entry-row">
+                  <span class="entry-date">{{ e.date }}</span>
+                  <span class="entry-title">{{ e.title }}</span>
+                  <span class="entry-amount">¥{{ e.amount | number }}</span>
+                </div>
+              }
+              <div class="entry-row subtotal">
+                <span></span>
+                <span>{{ t.total }}</span>
+                <span>¥{{ group.total | number }}</span>
+              </div>
+            </div>
+          }
+        </div>
+      }
+    }
+  </div>
+} @else {
+  <section class="daily-summary" [attr.aria-label]="t.daily">
+    @if (dailyGroups.length === 0) {
+      <p class="empty card">{{ t.noRecords }}</p>
+    }
+    @for (day of dailyGroups; track day.date) {
+      <article class="day-card card">
+        <h2>
+          <button
+            type="button"
+            class="day-header"
+            (click)="toggleDay(day)"
+            [attr.aria-expanded]="day.expanded"
+            [attr.aria-controls]="'day-' + day.date"
+          >
+            <time [attr.datetime]="day.date">{{ displayDay(day.date) }}</time>
+            <span aria-hidden="true">{{ day.expanded ? '−' : '+' }}</span>
+          </button>
+        </h2>
+        <dl class="day-totals">
+          <div>
+            <dt>{{ t.income }}</dt>
+            <dd>¥{{ day.income | number }}</dd>
+          </div>
+          <div>
+            <dt>{{ t.expense }}</dt>
+            <dd>¥{{ day.expense | number }}</dd>
+          </div>
+          <div>
+            <dt>{{ t.balance }}</dt>
+            <dd [class.negative]="day.balance < 0">¥{{ day.balance | number }}</dd>
+          </div>
+        </dl>
+        <div class="day-details" [id]="'day-' + day.date" [hidden]="!day.expanded">
+          @for (e of day.entries; track e.id) {
+            <div class="daily-entry">
+              <span class="daily-entry-title">{{ e.title }}</span>
+              <span class="daily-entry-amount"
+                >{{ e.type === 'income' ? t.income : t.expense }} ¥{{ e.amount | number }}</span
+              >
+              <span class="daily-entry-meta">{{ e.category }} · {{ e.billingMethod }}</span>
+            </div>
+          }
+        </div>
+      </article>
+    }
+  </section>
+}
