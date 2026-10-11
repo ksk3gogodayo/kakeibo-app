@@ -9,7 +9,9 @@ import { Translations } from '../i18n';
 
 Chart.register(...registerables);
 
-interface Entry {
+import { TimedEntry, compareEntryTime, entryTimeDate } from '../entry-time';
+
+interface Entry extends TimedEntry {
   id?: string;
   title: string;
   amount: number;
@@ -53,7 +55,12 @@ export class Summary implements OnInit, OnDestroy {
   selectedMonth = currentMonth();
   billingGroups: BillingGroup[] = [];
   dailyGroups: DailyGroup[] = [];
-  sortOrder = 'date-desc';
+  sortOrder = 'time-desc';
+  entryTimeDate = entryTimeDate;
+
+  sortedDayEntries(entries: Entry[]): Entry[] {
+    return [...entries].sort((a, b) => compareEntryTime(a, b, this.sortOrder === 'time-asc'));
+  }
 
   get sortedDailyGroups(): DailyGroup[] {
     const [field, direction] = this.sortOrder.split('-');
@@ -67,7 +74,7 @@ export class Summary implements OnInit, OnDestroy {
             : field === 'balance'
               ? a.balance - b.balance
               : a.date.localeCompare(b.date);
-      return sign * comparison || b.date.localeCompare(a.date);
+      return (field === 'time' ? b.date.localeCompare(a.date) : sign * comparison) || b.date.localeCompare(a.date);
     });
   }
   viewMode: 'monthly' | 'daily' = 'monthly';
@@ -114,7 +121,7 @@ export class Summary implements OnInit, OnDestroy {
     const uid = auth.currentUser?.uid;
     if (!uid) return;
     this.unsubscribe = onSnapshot(collection(db, 'users', uid, 'entries'), (snapshot) => {
-      this.allEntries = snapshot.docs.map((d) => ({ id: d.id, ...d.data() })) as Entry[];
+      this.allEntries = snapshot.docs.map((d) => ({ id: d.id, ...d.data({ serverTimestamps: 'estimate' }) })) as Entry[];
       this.refresh();
       this.cdr.detectChanges();
     });

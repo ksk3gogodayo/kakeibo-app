@@ -12,6 +12,11 @@ export interface Translations {
   expenseLowest: string;
   balanceHighest: string;
   balanceLowest: string;
+  timeNewest: string;
+  timeOldest: string;
+  recordedAt: string;
+  timeUnknown: string;
+  timeSortNote: string;
   appTitle: string;
   loading: string;
   logout: string;
@@ -60,6 +65,12 @@ export interface Translations {
 
 export const translations: Record<Lang, Translations> = {
   ja: {
+    timeNewest: '入力時刻：新しい順',
+    timeOldest: '入力時刻：古い順',
+    recordedAt: '登録日時',
+    timeUnknown: '時刻不明',
+    timeSortNote: '時間順は各日付の明細に適用します。時刻不明の過去の取引は末尾に表示します。',
+
     sortBy: '並び替え',
     dateNewest: '日付：新しい順',
     dateOldest: '日付：古い順',
@@ -125,6 +136,12 @@ export const translations: Record<Lang, Translations> = {
   },
 
   en: {
+    timeNewest: 'Entered: newest first',
+    timeOldest: 'Entered: oldest first',
+    recordedAt: 'Recorded at',
+    timeUnknown: 'Unknown time',
+    timeSortNote: 'Time order applies within each day. Older records without timestamps appear last.',
+
     sortBy: 'Sort by',
     dateNewest: 'Date: newest first',
     dateOldest: 'Date: oldest first',
@@ -190,6 +207,12 @@ export const translations: Record<Lang, Translations> = {
   },
 
   fil: {
+    timeNewest: 'Oras: pinakabago muna',
+    timeOldest: 'Oras: pinakaluma muna',
+    recordedAt: 'Oras ng pagtala',
+    timeUnknown: 'Hindi alam ang oras',
+    timeSortNote: 'Ayusin ang mga tala sa bawat araw ayon sa oras. Nasa hulihan ang mga talang walang oras.',
+
     sortBy: 'Pagkakasunod-sunod',
     dateNewest: 'Petsa: pinakabago muna',
     dateOldest: 'Petsa: pinakaluma muna',

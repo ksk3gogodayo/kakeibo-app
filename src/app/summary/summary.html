@@ -70,8 +70,8 @@
     <div class="field">
       <label for="summary-sort">{{ t.sortBy }}</label>
       <select id="summary-sort" [(ngModel)]="sortOrder">
-        <option value="date-desc">{{ t.dateNewest }}</option>
-        <option value="date-asc">{{ t.dateOldest }}</option>
+        <option value="time-desc">{{ t.timeNewest }}</option>
+        <option value="time-asc">{{ t.timeOldest }}</option>
         <option value="income-desc">{{ t.incomeHighest }}</option>
         <option value="income-asc">{{ t.incomeLowest }}</option>
         <option value="expense-desc">{{ t.expenseHighest }}</option>
@@ -81,6 +81,7 @@
       </select>
     </div>
 
+    <p class="sort-note">{{ t.timeSortNote }}</p>
     @if (dailyGroups.length === 0) {
       <p class="empty card">{{ t.noRecords }}</p>
     }
@@ -113,13 +114,18 @@
           </div>
         </dl>
         <div class="day-details" [id]="'day-' + day.date" [hidden]="!day.expanded">
-          @for (e of day.entries; track e.id) {
+          @for (e of sortedDayEntries(day.entries); track e.id) {
             <div class="daily-entry">
               <span class="daily-entry-title">{{ e.title }}</span>
               <span class="daily-entry-amount"
                 >{{ e.type === 'income' ? t.income : t.expense }} ¥{{ e.amount | number }}</span
               >
               <span class="daily-entry-meta">{{ e.category }} · {{ e.billingMethod }}</span>
+              <span class="daily-entry-meta">{{ t.recordedAt }}:
+                @if (entryTimeDate(e); as time) {
+                  {{ time | date:'yyyy/MM/dd HH:mm:ss' }}
+                } @else { {{ t.timeUnknown }} }
+              </span>
             </div>
           }
         </div>

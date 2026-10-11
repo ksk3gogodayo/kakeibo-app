@@ -8,6 +8,7 @@ vi.mock('firebase/auth', () => ({
   GoogleAuthProvider: class {},
 }));
 vi.mock('firebase/firestore', () => ({
+  serverTimestamp: vi.fn(() => 'server-time'),
   getFirestore: () => ({}),
   collection: vi.fn(() => 'entries'),
   doc: vi.fn(() => 'document'),
@@ -48,7 +49,7 @@ describe('Entries', () => {
     await component.save();
     expect(addDoc).toHaveBeenCalledWith(
       'entries',
-      expect.objectContaining({ type: 'income', title: 'Salary', amount: 200000 }),
+      expect.objectContaining({ type: 'income', title: 'Salary', amount: 200000, createdAt: 'server-time' }),
     );
     expect(component.entry.type).toBe('expense');
   });
@@ -103,6 +104,12 @@ describe('Entries', () => {
     expect(fixture.nativeElement.querySelector('.entry-card .entry-title').textContent).toContain('Small');
     fixture.nativeElement.querySelector('.entry-card .entry-actions button').click();
     expect(component.editTargetId).toBe('b');
+  });
+
+  it('does not overwrite creation time when editing', async () => {
+    component.edit({ ...legacy, createdAt: { seconds: 100, nanoseconds: 0 } });
+    await component.save();
+    expect(updateDoc).toHaveBeenCalledWith('document', expect.not.objectContaining({ createdAt: expect.anything() }));
   });
 
 });

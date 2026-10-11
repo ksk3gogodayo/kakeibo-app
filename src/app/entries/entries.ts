@@ -1,13 +1,15 @@
 import { Component, OnInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc } from 'firebase/firestore';
+import { addDoc, collection, deleteDoc, doc, onSnapshot, updateDoc, serverTimestamp } from 'firebase/firestore';
 import { db, auth } from '../firebase';
 import { MASTER_DEFAULTS } from '../settings/settings';
 import { LangService } from '../lang.service';
 import { Translations } from '../i18n';
 
-interface Entry {
+import { TimedEntry, compareEntryTime } from '../entry-time';
+
+interface Entry extends TimedEntry {
   id?: string;
   title: string;
   amount: number;
@@ -46,7 +48,7 @@ export class Entries implements OnInit {
     return [...this.entryList].sort((a, b) => {
       const comparison = field === 'amount' ? a.amount - b.amount : a.date.localeCompare(b.date);
       return (
-        sign * comparison || b.date.localeCompare(a.date) || (a.id ?? '').localeCompare(b.id ?? '')
+        sign * comparison || b.date.localeCompare(a.date) || compareEntryTime(a, b, field === 'date' && direction === 'asc')
       );
     });
   }
@@ -80,7 +82,7 @@ export class Entries implements OnInit {
     onSnapshot(collection(db, 'users', uid, 'entries'), (snapshot) => {
       this.entryList = snapshot.docs.map((d) => ({
         id: d.id,
-        ...d.data(),
+        ...d.data({ serverTimestamps: 'estimate' }),
       })) as Entry[];
       this.cdr.detectChanges();
     });
@@ -98,11 +100,12 @@ export class Entries implements OnInit {
 
     if (this.editTargetId) {
       const ref = doc(db, 'users', uid, 'entries', this.editTargetId);
-      await updateDoc(ref, { ...this.entry });
+      const { createdAt, ...changes } = this.entry;
+      await updateDoc(ref, changes);
       alert(this.t.msgUpdated);
       this.editTargetId = null;
     } else {
-      await addDoc(collection(db, 'users', uid, 'entries'), this.entry);
+      await addDoc(collection(db, 'users', uid, 'entries'), { ...this.entry, createdAt: serverTimestamp() });
       alert(this.t.msgSaved);
     }
     this.reset();
