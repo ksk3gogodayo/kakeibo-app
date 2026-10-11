@@ -1,6 +1,17 @@
 export type Lang = 'ja' | 'en' | 'fil';
 
 export interface Translations {
+  sortBy: string;
+  dateNewest: string;
+  dateOldest: string;
+  amountHighest: string;
+  amountLowest: string;
+  incomeHighest: string;
+  incomeLowest: string;
+  expenseHighest: string;
+  expenseLowest: string;
+  balanceHighest: string;
+  balanceLowest: string;
   appTitle: string;
   loading: string;
   logout: string;
@@ -49,6 +60,18 @@ export interface Translations {
 
 export const translations: Record<Lang, Translations> = {
   ja: {
+    sortBy: '並び替え',
+    dateNewest: '日付：新しい順',
+    dateOldest: '日付：古い順',
+    amountHighest: '金額：多い順',
+    amountLowest: '金額：少ない順',
+    incomeHighest: '収入：多い順',
+    incomeLowest: '収入：少ない順',
+    expenseHighest: '支出：多い順',
+    expenseLowest: '支出：少ない順',
+    balanceHighest: '差額：大きい順',
+    balanceLowest: '差額：小さい順',
+
     appTitle: '家計簿',
     loading: '読み込み中...',
     logout: 'ログアウト',
@@ -102,6 +125,18 @@ export const translations: Record<Lang, Translations> = {
   },
 
   en: {
+    sortBy: 'Sort by',
+    dateNewest: 'Date: newest first',
+    dateOldest: 'Date: oldest first',
+    amountHighest: 'Amount: highest first',
+    amountLowest: 'Amount: lowest first',
+    incomeHighest: 'Income: highest first',
+    incomeLowest: 'Income: lowest first',
+    expenseHighest: 'Expense: highest first',
+    expenseLowest: 'Expense: lowest first',
+    balanceHighest: 'Balance: highest first',
+    balanceLowest: 'Balance: lowest first',
+
     appTitle: 'Kakeibo',
     loading: 'Loading...',
     logout: 'Logout',
@@ -155,6 +190,18 @@ export const translations: Record<Lang, Translations> = {
   },
 
   fil: {
+    sortBy: 'Pagkakasunod-sunod',
+    dateNewest: 'Petsa: pinakabago muna',
+    dateOldest: 'Petsa: pinakaluma muna',
+    amountHighest: 'Halaga: pinakamataas muna',
+    amountLowest: 'Halaga: pinakamababa muna',
+    incomeHighest: 'Kita: pinakamataas muna',
+    incomeLowest: 'Kita: pinakamababa muna',
+    expenseHighest: 'Gastos: pinakamataas muna',
+    expenseLowest: 'Gastos: pinakamababa muna',
+    balanceHighest: 'Balanse: pinakamataas muna',
+    balanceLowest: 'Balanse: pinakamababa muna',
+
     appTitle: 'Talaan ng Gastos',
     loading: 'Naglo-load...',
     logout: 'Mag-logout',

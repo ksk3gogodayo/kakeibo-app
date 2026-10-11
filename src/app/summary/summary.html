@@ -67,10 +67,24 @@
   </div>
 } @else {
   <section class="daily-summary" [attr.aria-label]="t.daily">
+    <div class="field">
+      <label for="summary-sort">{{ t.sortBy }}</label>
+      <select id="summary-sort" [(ngModel)]="sortOrder">
+        <option value="date-desc">{{ t.dateNewest }}</option>
+        <option value="date-asc">{{ t.dateOldest }}</option>
+        <option value="income-desc">{{ t.incomeHighest }}</option>
+        <option value="income-asc">{{ t.incomeLowest }}</option>
+        <option value="expense-desc">{{ t.expenseHighest }}</option>
+        <option value="expense-asc">{{ t.expenseLowest }}</option>
+        <option value="balance-desc">{{ t.balanceHighest }}</option>
+        <option value="balance-asc">{{ t.balanceLowest }}</option>
+      </select>
+    </div>
+
     @if (dailyGroups.length === 0) {
       <p class="empty card">{{ t.noRecords }}</p>
     }
-    @for (day of dailyGroups; track day.date) {
+    @for (day of sortedDailyGroups; track day.date) {
       <article class="day-card card">
         <h2>
           <button

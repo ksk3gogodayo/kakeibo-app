@@ -137,4 +137,43 @@ describe('Summary', () => {
     expect(mocks.unsubscribe).toHaveBeenCalledTimes(1);
     expect(mocks.destroy).toHaveBeenCalled();
   });
+  it('sorts each daily total numerically, including negative balances and ties', () => {
+    publish([entry('a', '2026-10-01', 100), entry('b', '2026-10-02', 9, 'income'),
+      entry('c', '2026-10-03', 20), entry('d', '2026-10-03', 200, 'income')]);
+    const dates = (order: string) => {
+      component.sortOrder = order;
+      return component.sortedDailyGroups.map(g => g.date.slice(-2));
+    };
+    expect(dates('date-asc')).toEqual(['01', '02', '03']);
+    expect(dates('date-desc')).toEqual(['03', '02', '01']);
+    expect(dates('income-asc')).toEqual(['01', '02', '03']);
+    expect(dates('income-desc')).toEqual(['03', '02', '01']);
+    expect(dates('expense-asc')).toEqual(['02', '03', '01']);
+    expect(dates('expense-desc')).toEqual(['01', '03', '02']);
+    expect(dates('balance-asc')).toEqual(['01', '02', '03']);
+    expect(dates('balance-desc')).toEqual(['03', '02', '01']);
+    expect(component.dailyGroups.map(g => g.date.slice(-2))).toEqual(['03', '02', '01']);
+    publish([entry('a', '2026-10-01', 0), entry('b', '2026-10-02', 0)]);
+    expect(dates('balance-asc')).toEqual(['02', '01']);
+  });
+
+  it('keeps the expanded date and selected sort after live updates and view switching', async () => {
+    publish([entry('a', '2026-10-01', 100), entry('b', '2026-10-02', 9)]);
+    component.setView('daily');
+    fixture.nativeElement.querySelector('.day-header').click(); fixture.detectChanges();
+    const select = fixture.nativeElement.querySelector('#summary-sort') as HTMLSelectElement;
+    select.value = 'expense-desc'; select.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+    expect(fixture.nativeElement.querySelector('time').getAttribute('datetime')).toBe('2026-10-01');
+    expect(component.dailyGroups.find(g => g.date === '2026-10-02')?.expanded).toBe(true);
+    publish([entry('a', '2026-10-01', 100), entry('b', '2026-10-02', 200)]);
+    expect(fixture.nativeElement.querySelector('time').getAttribute('datetime')).toBe('2026-10-02');
+    expect(fixture.nativeElement.querySelector('.day-header').getAttribute('aria-expanded')).toBe('true');
+    component.setView('monthly'); component.setView('daily');
+    expect(component.sortOrder).toBe('expense-desc');
+    expect(component.monthTotal).toBe(300);
+    component.prevMonth();
+    expect(component.sortedDailyGroups).toEqual([]);
+  });
+
 });
