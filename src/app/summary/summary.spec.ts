@@ -176,4 +176,21 @@ describe('Summary', () => {
     expect(component.sortedDailyGroups).toEqual([]);
   });
 
+  it('sorts daily details by creation time using the selector and keeps unknown times last', async () => {
+    publish([
+      { ...entry('a', '2026-10-01', 1), createdAt: { seconds: 100, nanoseconds: 1 } },
+      entry('legacy', '2026-10-01', 2),
+      { ...entry('b', '2026-10-01', 3), createdAt: { seconds: 100, nanoseconds: 2 } },
+    ]);
+    component.setView('daily');
+    expect(component.sortedDayEntries(component.dailyGroups[0].entries).map(e => e.id)).toEqual(['b', 'a', 'legacy']);
+    const select = fixture.nativeElement.querySelector('#summary-sort') as HTMLSelectElement;
+    select.value = 'time-asc'; select.dispatchEvent(new Event('change'));
+    await fixture.whenStable();
+    expect(component.sortedDayEntries(component.dailyGroups[0].entries).map(e => e.id)).toEqual(['a', 'b', 'legacy']);
+    expect(fixture.nativeElement.querySelector('.daily-entry-title').textContent).toContain('Item a');
+    expect(fixture.nativeElement.textContent).toContain('時刻不明');
+    expect(component.monthTotal).toBe(6);
+  });
+
 });
