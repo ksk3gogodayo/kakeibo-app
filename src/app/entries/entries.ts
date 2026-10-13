@@ -6,6 +6,7 @@ import { db, auth } from '../firebase';
 import { MASTER_DEFAULTS } from '../settings/settings';
 import { LangService } from '../lang.service';
 import { Translations } from '../i18n';
+import { localDate } from '../local-date';
 
 import { TimedEntry, compareEntryTime } from '../entry-time';
 
@@ -35,7 +36,7 @@ export class Entries implements OnInit {
     category: MASTER_DEFAULTS.categories[0],
     paymentMethod: MASTER_DEFAULTS.paymentMethods[0],
     billingMethod: MASTER_DEFAULTS.billingMethods[0],
-    date: new Date().toISOString().split('T')[0],
+    date: localDate(),
   };
 
   editTargetId: string | null = null;
@@ -133,7 +134,7 @@ export class Entries implements OnInit {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = `kakeibo_${new Date().toISOString().split('T')[0]}.csv`;
+    a.download = `kakeibo_${localDate()}.csv`;
     a.click();
     URL.revokeObjectURL(url);
   }
@@ -153,7 +154,7 @@ export class Entries implements OnInit {
       category: this.categories[0] ?? '',
       paymentMethod: this.paymentMethods[0] ?? '',
       billingMethod: this.billingMethods[0] ?? '',
-      date: new Date().toISOString().split('T')[0],
+      date: localDate(),
     };
     this.editTargetId = null;
   }
