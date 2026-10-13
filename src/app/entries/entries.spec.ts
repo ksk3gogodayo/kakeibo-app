@@ -112,4 +112,20 @@ describe('Entries', () => {
     expect(updateDoc).toHaveBeenCalledWith('document', expect.not.objectContaining({ createdAt: expect.anything() }));
   });
 
+  it('uses local dates initially and after save, preserving a manually selected date', async () => {
+    vi.useFakeTimers({ toFake: ['Date'] });
+    try {
+      vi.setSystemTime(new Date(2026, 0, 1, 0, 30));
+      const fresh = TestBed.createComponent(Entries).componentInstance;
+      expect(fresh.entry.date).toBe('2026-01-01');
+      fresh.entry.date = '2025-12-25';
+      vi.setSystemTime(new Date(2026, 0, 2, 0, 30));
+      await fresh.save();
+      expect(addDoc).toHaveBeenCalledWith('entries', expect.objectContaining({ date: '2025-12-25' }));
+      expect(fresh.entry.date).toBe('2026-01-02');
+    } finally {
+      vi.useRealTimers();
+    }
+  });
+
 });
